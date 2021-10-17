@@ -1,32 +1,44 @@
 const data = require('../data/zoo_data');
 
-function verificateParam() {
-  const result = {};
-
-  data.species.map((value) => {
-    result[`${value.name}`] = value.residents.length;
-    return result;
-  });
-  return result;
-}
-function countAnimals(animal) {
-  let countAnimalsOfSpecie;
+let countAnimalsOfSpecie;
+let filterSpecie;
+function verificateUndefined(animal) {
   if (animal === undefined) {
-    return verificateParam();
+    countAnimalsOfSpecie = {};
+    data.species.map((value) => {
+      countAnimalsOfSpecie[`${value.name}`] = value.residents.length;
+      return countAnimalsOfSpecie;
+    });
   }
-  const findSpecie = data.species.filter((value) => value.name === animal.specie);
-  if (Object.values(animal).length === 1) {
-    countAnimalsOfSpecie = findSpecie.map((value) => value.residents.length).join();
-    return Number(countAnimalsOfSpecie);
+  return countAnimalsOfSpecie;
+}
+function filter(animal) {
+  if (animal !== undefined) {
+    filterSpecie = data.species.filter((value) => value.name === animal.specie);
+    return filterSpecie;
   }
-  if (Object.values(animal).length === 2) {
-    countAnimalsOfSpecie = findSpecie
-      .map((value) => value.residents
-        .filter((val) => val.sex === animal.sex))[0].length;
+}
+function countAnimalByName(animal) {
+  if (animal !== undefined && Object.values(animal).length === 1) {
+    countAnimalsOfSpecie = filterSpecie.map((value) => value.residents.length);
+    countAnimalsOfSpecie = Number(countAnimalsOfSpecie[0]);
     return countAnimalsOfSpecie;
   }
 }
-
-console.log(countAnimals());
+function countAnimalsBySex(animal) {
+  if (animal !== undefined && Object.values(animal).length === 2) {
+    const animalsOfSpecie = filterSpecie.map((value) => value.residents);
+    const filterAnimalsOfSex = animalsOfSpecie[0].filter((val) => val.sex === animal.sex);
+    countAnimalsOfSpecie = filterAnimalsOfSex.length;
+    return countAnimalsOfSpecie;
+  }
+}
+function countAnimals(animal) {
+  verificateUndefined(animal);
+  filter(animal);
+  countAnimalByName(animal);
+  countAnimalsBySex(animal);
+  return countAnimalsOfSpecie;
+}
 
 module.exports = countAnimals;
